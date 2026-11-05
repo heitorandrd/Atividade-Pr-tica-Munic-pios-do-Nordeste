@@ -1,14 +1,7 @@
-/* ==========================================================================
-   Atividade Prática 01: Municípios do Nordeste
-   Folha de estilos principal
-   ========================================================================== */
-
-/* ----------------------------- Base ------------------------------------- */
 body {
     background-color: #f0f2f5;
 }
 
-/* ----------------------------- Layout ----------------------------------- */
 .faixa-azul {
     background-color: #26406b;
     height: 290px;
@@ -30,7 +23,6 @@ body {
     padding: 0 40px 24px 40px;
 }
 
-/* ----------------------------- Cabeçalho -------------------------------- */
 .cabecalho {
     text-align: center;
     color: #ffffff;
@@ -50,7 +42,6 @@ body {
     margin: 0;
 }
 
-/* ----------------------------- Cartões de metadados --------------------- */
 .cartoes-info {
     margin-top: -12px;
     margin-bottom: 20px;
@@ -80,19 +71,16 @@ body {
     font-size: 1.1rem;
 }
 
-/* ----------------------------- Cards (formulário e lista) --------------- */
 .card-header h2 {
     font-size: 1.7rem;
     margin: 0;
     font-weight: 500;
 }
 
-/* ----------------------------- Tabela ----------------------------------- */
 tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
 }
 
-/* ----------------------------- Links ------------------------------------ */
 .link-download {
     font-size: 0.95rem;
 }
@@ -101,7 +89,6 @@ tbody tr:nth-child(odd) {
     text-decoration: none;
 }
 
-/* ----------------------------- Rodapé ----------------------------------- */
 .rodape {
     border-top: 1px solid #dee2e6;
     margin-top: 24px;

@@ -3,11 +3,8 @@ import json
 from flask import Flask, Response, jsonify, render_template, request
 
 app = Flask(__name__)
-app.json.ensure_ascii = False  # Mantém acentos corretos nas respostas JSON
+app.json.ensure_ascii = False
 
-# ---------------------------------------------------------------------------
-# BASE DE DADOS EM MEMÓRIA (dicionário)
-# ---------------------------------------------------------------------------
 municipios_nordeste_dataset = {
     "metadados": {
         "regiao": "Nordeste",
@@ -52,23 +49,13 @@ municipios_nordeste_dataset = {
 CAMPOS_OBRIGATORIOS = ["id_ibge", "estado", "sigla_uf", "populacao_estimada"]
 
 
-# ---------------------------------------------------------------------------
-# FUNÇÕES AUXILIARES
-# ---------------------------------------------------------------------------
 def atualizar_total():
-    """Mantém o total de municípios dos metadados sempre sincronizado."""
     municipios_nordeste_dataset["metadados"]["total_municipios"] = len(
         municipios_nordeste_dataset["municipios"]
     )
 
 
 def validar_campos(dados, parcial=False):
-    """
-    Valida e normaliza os campos de um município.
-    - parcial=False (POST): todos os campos obrigatórios devem existir.
-    - parcial=True (PATCH): valida apenas os campos enviados.
-    Retorna (dados_limpos, mensagem_de_erro).
-    """
     limpo = {}
 
     if not parcial:
@@ -120,26 +107,17 @@ def validar_campos(dados, parcial=False):
     return limpo, None
 
 
-# ---------------------------------------------------------------------------
-# PÁGINA PRINCIPAL (interface igual à imagem)
-# ---------------------------------------------------------------------------
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-# ---------------------------------------------------------------------------
-# METADADOS
-# ---------------------------------------------------------------------------
 @app.route("/metadados", methods=["GET"])
 def obter_metadados():
     atualizar_total()
     return jsonify(municipios_nordeste_dataset["metadados"]), 200
 
 
-# ---------------------------------------------------------------------------
-# LISTAR TODOS / FILTRAR POR ESTADO  ->  GET /municipios  |  GET /municipios?uf=CE
-# ---------------------------------------------------------------------------
 @app.route("/municipios", methods=["GET"])
 def listar_municipios():
     uf = request.args.get("uf")
@@ -155,9 +133,6 @@ def listar_municipios():
     return jsonify(municipios_nordeste_dataset["municipios"]), 200
 
 
-# ---------------------------------------------------------------------------
-# CONSULTAR POR NOME  ->  GET /municipios/<nome>
-# ---------------------------------------------------------------------------
 @app.route("/municipios/<nome>", methods=["GET"])
 def consultar_municipio(nome):
     municipio = municipios_nordeste_dataset["municipios"].get(nome)
@@ -166,9 +141,6 @@ def consultar_municipio(nome):
     return jsonify({nome: municipio}), 200
 
 
-# ---------------------------------------------------------------------------
-# CADASTRAR NOVO  ->  POST /municipios
-# ---------------------------------------------------------------------------
 @app.route("/municipios", methods=["POST"])
 def cadastrar_municipio():
     dados = request.get_json(silent=True)
@@ -186,7 +158,6 @@ def cadastrar_municipio():
     if erro:
         return jsonify({"erro": erro}), 400
 
-    # O nome da cidade vira a nova chave do dicionário
     municipios_nordeste_dataset["municipios"][nome] = limpo
     atualizar_total()
 
@@ -196,9 +167,6 @@ def cadastrar_municipio():
     }), 201
 
 
-# ---------------------------------------------------------------------------
-# ATUALIZAR  ->  PATCH /municipios/<nome>
-# ---------------------------------------------------------------------------
 @app.route("/municipios/<nome>", methods=["PATCH"])
 def atualizar_municipio(nome):
     municipio = municipios_nordeste_dataset["municipios"].get(nome)
@@ -224,9 +192,6 @@ def atualizar_municipio(nome):
     }), 200
 
 
-# ---------------------------------------------------------------------------
-# EXCLUIR  ->  DELETE /municipios/<nome>
-# ---------------------------------------------------------------------------
 @app.route("/municipios/<nome>", methods=["DELETE"])
 def excluir_municipio(nome):
     if nome not in municipios_nordeste_dataset["municipios"]:
@@ -238,9 +203,6 @@ def excluir_municipio(nome):
     return jsonify({"mensagem": f"Município '{nome}' removido com sucesso."}), 200
 
 
-# ---------------------------------------------------------------------------
-# LINK PARA BAIXAR O JSON COM TODOS OS MUNICÍPIOS  ->  GET /download/municipios.json
-# ---------------------------------------------------------------------------
 @app.route("/download/municipios.json", methods=["GET"])
 def baixar_json():
     atualizar_total()
@@ -253,5 +215,4 @@ def baixar_json():
 
 
 if __name__ == "__main__":
-    # host 0.0.0.0 é necessário para funcionar no GitHub Codespaces
     app.run(host="0.0.0.0", port=5000, debug=True)

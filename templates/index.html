@@ -96,13 +96,11 @@
 
     <div class="pagina">
 
-        <!-- Cabeçalho -->
         <div class="cabecalho">
             <h1>Atividade Prática: Municípios do Nordeste</h1>
             <p>Gerenciamento de Municípios (Base em Memória)</p>
         </div>
 
-        <!-- Cartões de metadados -->
         <div class="row g-3 cartoes-info">
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="cartao-info">
@@ -130,12 +128,10 @@
             </div>
         </div>
 
-        <!-- Área de mensagens -->
         <div id="mensagem"></div>
 
         <div class="row g-4">
 
-           
             <div class="col-lg-5">
                 <div class="card">
                     <div class="card-header">
@@ -181,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- LISTA -->
             <div class="col-lg-7">
                 <div class="card">
                     <div class="card-header">
@@ -237,7 +232,6 @@
         let municipiosAtuais = {};
         let nomeEmEdicao = null;
 
-    
         function escapeHtml(texto) {
             const div = document.createElement("div");
             div.textContent = String(texto);
@@ -274,7 +268,6 @@
             };
         }
 
-       
         async function carregarMetadados() {
             try {
                 const meta = await api("/metadados");
@@ -287,7 +280,6 @@
             }
         }
 
-        
         async function carregarLista() {
             const uf = $("filtro-uf").value.trim();
             const url = uf ? "/municipios?uf=" + encodeURIComponent(uf) : "/municipios";
@@ -331,7 +323,6 @@
                 corpo.appendChild(tr);
             });
         }
-
 
         function limparFormulario() {
             $("form-municipio").reset();
