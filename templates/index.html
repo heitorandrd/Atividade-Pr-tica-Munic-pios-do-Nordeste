@@ -1,19 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Atividade Prática: Municípios</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .faixa-azul {
+            background-color: #26406b;
+            height: 290px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 0;
+        }
+        .pagina {
+            position: relative;
+            z-index: 1;
+            max-width: 1180px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            padding: 0 40px 24px 40px;
+        }
+        .cabecalho {
+            text-align: center;
+            color: #ffffff;
+            padding: 56px 0 24px 0;
+            margin: 0 -40px;
+            background-color: #26406b;
+            border-radius: 6px 6px 0 0;
+        }
+        .cabecalho h1 {
+            font-size: 2.6rem;
+            font-weight: 500;
+        }
+        .cabecalho p {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        .cartoes-info {
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+        .cartao-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            height: 100%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        .cartao-info .icone {
+            font-size: 1.7rem;
+            color: #4a5a78;
+            width: 34px;
+            text-align: center;
+        }
+        .cartao-info .texto {
+            line-height: 1.25;
+            font-size: 1.1rem;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            margin: 0;
+            font-weight: 500;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+        .rodape {
+            border-top: 1px solid #dee2e6;
+            margin-top: 24px;
+            padding-top: 18px;
+            text-align: center;
+        }
+        .link-download {
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
 <body>
-    <div class="App">
-        <header class="App-header">
-            <img src="{{ url_for('static', filename='Octocat.png') }}" class="App-logo" alt="logo" />
-            <p>
-                GitHub Codespaces <span class="heart">♥️</span> Flask
-            </p>
-            <p class="small">
-                Edit <code>templates/index.html</code> and refresh to see your changes!
-            </p>
-        </header>
-    </div>
-</body>
+    <div class="faixa-azul"></div>
 
+    <div class="pagina">
+
+        <!-- Cabeçalho -->
+        <div class="cabecalho">
+            <h1>Atividade Prática: Municípios do Nordeste</h1>
+            <p>Gerenciamento de Municípios (Base em Memória)</p>
+        </div>
+
+        <!-- Cartões de metadados -->
+        <div class="row g-3 cartoes-info">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cartao-info">
+                    <i class="fa-solid fa-earth-americas icone"></i>
+                    <div class="texto">Região:<br><span id="meta-regiao">Nordeste</span></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cartao-info">
+                    <span class="icone">🇧🇷</span>
+                    <div class="texto">País:<br><span id="meta-pais">Brasil</span></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cartao-info">
+                    <i class="fa-solid fa-users icone"></i>
+                    <div class="texto">Total:<br><span id="meta-total">0</span></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="cartao-info">
+                    <i class="fa-solid fa-circle-info icone"></i>
+                    <div class="texto">Fonte:<br><span id="meta-fonte">IBGE</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de mensagens -->
+        <div id="mensagem"></div>
+
+        <div class="row g-4">
+
+           
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Cadastrar / Atualizar Município</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-municipio" autocomplete="off">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome do Município</label>
+                                <input type="text" class="form-control" id="nome" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_ibge" class="form-label">ID IBGE</label>
+                                <input type="number" class="form-control" id="id_ibge" min="1" required>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-7">
+                                    <label for="estado" class="form-label">Estado</label>
+                                    <input type="text" class="form-control" id="estado" required>
+                                </div>
+                                <div class="col-5">
+                                    <label for="sigla_uf" class="form-label">UF</label>
+                                    <input type="text" class="form-control text-uppercase" id="sigla_uf" maxlength="2" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="populacao_estimada" class="form-label">População Estimada</label>
+                                <input type="number" class="form-control" id="populacao_estimada" min="0" required>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="capital">
+                                <label class="form-check-label" for="capital">Capital?</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Salvar / Atualizar</button>
+                            <button type="button" class="btn btn-primary" id="btn-buscar-nome">Buscar por Nome</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTA -->
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Lista de Municípios</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-7">
+                                <label for="busca" class="form-label">Busca</label>
+                                <input type="text" class="form-control" id="busca" placeholder="Busca">
+                            </div>
+                            <div class="col-md-5">
+                                <label for="filtro-uf" class="form-label">Filtrar por UF</label>
+                                <input type="text" class="form-control text-uppercase" id="filtro-uf" placeholder="ex: CE" maxlength="2">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="/download/municipios.json" class="link-download" download="municipios_nordeste.json">
+                                <i class="fa-solid fa-download"></i> Baixar JSON com todos os municípios
+                            </a>
+                            <button type="button" class="btn btn-success" id="btn-novo">Cadastrar Novo</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>UF</th>
+                                        <th>Capital</th>
+                                        <th>População</th>
+                                        <th>ID IBGE</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-corpo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rodape">
+            Desenvolvido em <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener" style="text-decoration:none;">Flask</a> | Manipulação de Dicionários
+        </div>
+    </div>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+
+        let municipiosAtuais = {};
+        let nomeEmEdicao = null;
+
+    
+        function escapeHtml(texto) {
+            const div = document.createElement("div");
+            div.textContent = String(texto);
+            return div.innerHTML;
+        }
+
+        function mostrarMensagem(texto, tipo) {
+            const area = $("mensagem");
+            area.innerHTML =
+                '<div class="alert alert-' + tipo + ' alert-dismissible fade show" role="alert">' +
+                escapeHtml(texto) +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+        }
+
+        async function api(url, opcoes) {
+            const resposta = await fetch(url, opcoes);
+            let dados = null;
+            try {
+                dados = await resposta.json();
+            } catch (e) {
+                dados = null;
+            }
+            if (!resposta.ok) {
+                throw new Error((dados && dados.erro) || ("Erro " + resposta.status));
+            }
+            return dados;
+        }
+
+        function jsonOpcoes(metodo, corpo) {
+            return {
+                method: metodo,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(corpo)
+            };
+        }
+
+       
+        async function carregarMetadados() {
+            try {
+                const meta = await api("/metadados");
+                $("meta-regiao").textContent = meta.regiao;
+                $("meta-pais").textContent = meta.pais;
+                $("meta-total").textContent = meta.total_municipios;
+                $("meta-fonte").textContent = meta.fonte_dados_populacao;
+            } catch (e) {
+                mostrarMensagem(e.message, "danger");
+            }
+        }
+
+        
+        async function carregarLista() {
+            const uf = $("filtro-uf").value.trim();
+            const url = uf ? "/municipios?uf=" + encodeURIComponent(uf) : "/municipios";
+            try {
+                municipiosAtuais = await api(url);
+                renderizarTabela();
+            } catch (e) {
+                mostrarMensagem(e.message, "danger");
+            }
+        }
+
+        function renderizarTabela() {
+            const termo = $("busca").value.trim().toLowerCase();
+            const corpo = $("tabela-corpo");
+            corpo.innerHTML = "";
+
+            const nomes = Object.keys(municipiosAtuais)
+                .filter((nome) => nome.toLowerCase().includes(termo))
+                .sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+            if (nomes.length === 0) {
+                corpo.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhum município encontrado.</td></tr>';
+                return;
+            }
+
+            nomes.forEach((nome) => {
+                const m = municipiosAtuais[nome];
+                const tr = document.createElement("tr");
+                tr.innerHTML =
+                    "<td>" + escapeHtml(nome) + "</td>" +
+                    "<td>" + escapeHtml(m.sigla_uf) + "</td>" +
+                    "<td>" + (m.capital ? "Sim" : "Não") + "</td>" +
+                    "<td>" + Number(m.populacao_estimada).toLocaleString("pt-BR") + "</td>" +
+                    "<td>" + escapeHtml(m.id_ibge) + "</td>" +
+                    "<td>" +
+                        '<button type="button" class="btn btn-primary btn-sm me-1 btn-editar" title="Editar" data-nome="' + escapeHtml(nome) + '">' +
+                            '<i class="fa-solid fa-pencil"></i></button>' +
+                        '<button type="button" class="btn btn-danger btn-sm btn-excluir" title="Excluir" data-nome="' + escapeHtml(nome) + '">' +
+                            '<i class="fa-solid fa-trash"></i></button>' +
+                    "</td>";
+                corpo.appendChild(tr);
+            });
+        }
+
+
+        function limparFormulario() {
+            $("form-municipio").reset();
+            $("nome").readOnly = false;
+            nomeEmEdicao = null;
+        }
+
+        function preencherFormulario(nome, m) {
+            $("nome").value = nome;
+            $("id_ibge").value = m.id_ibge;
+            $("estado").value = m.estado;
+            $("sigla_uf").value = m.sigla_uf;
+            $("populacao_estimada").value = m.populacao_estimada;
+            $("capital").checked = m.capital;
+            $("nome").readOnly = true;
+            nomeEmEdicao = nome;
+        }
+
+        async function salvar(evento) {
+            evento.preventDefault();
+
+            const dados = {
+                id_ibge: Number($("id_ibge").value),
+                estado: $("estado").value.trim(),
+                sigla_uf: $("sigla_uf").value.trim().toUpperCase(),
+                populacao_estimada: Number($("populacao_estimada").value),
+                capital: $("capital").checked
+            };
+
+            try {
+                let resposta;
+                if (nomeEmEdicao) {
+                    resposta = await api(
+                        "/municipios/" + encodeURIComponent(nomeEmEdicao),
+                        jsonOpcoes("PATCH", dados)
+                    );
+                } else {
+                    dados.nome = $("nome").value.trim();
+                    resposta = await api("/municipios", jsonOpcoes("POST", dados));
+                }
+                mostrarMensagem(resposta.mensagem, "success");
+                limparFormulario();
+                await carregarLista();
+                await carregarMetadados();
+            } catch (e) {
+                mostrarMensagem(e.message, "danger");
+            }
+        }
+
+        async function buscarPorNome() {
+            const nome = $("nome").value.trim();
+            if (!nome) {
+                mostrarMensagem("Digite o nome do município para buscar.", "warning");
+                return;
+            }
+            try {
+                const resposta = await api("/municipios/" + encodeURIComponent(nome));
+                const chave = Object.keys(resposta)[0];
+                preencherFormulario(chave, resposta[chave]);
+                mostrarMensagem("Município '" + chave + "' encontrado. Você pode editá-lo e salvar.", "info");
+            } catch (e) {
+                mostrarMensagem(e.message, "danger");
+            }
+        }
+
+        async function excluir(nome) {
+            if (!confirm("Deseja realmente excluir o município '" + nome + "'?")) {
+                return;
+            }
+            try {
+                const resposta = await api("/municipios/" + encodeURIComponent(nome), { method: "DELETE" });
+                mostrarMensagem(resposta.mensagem, "success");
+                if (nomeEmEdicao === nome) {
+                    limparFormulario();
+                }
+                await carregarLista();
+                await carregarMetadados();
+            } catch (e) {
+                mostrarMensagem(e.message, "danger");
+            }
+        }
+
+        $("form-municipio").addEventListener("submit", salvar);
+        $("btn-buscar-nome").addEventListener("click", buscarPorNome);
+        $("btn-novo").addEventListener("click", function () {
+            limparFormulario();
+            $("nome").focus();
+        });
+        $("busca").addEventListener("input", renderizarTabela);
+        $("filtro-uf").addEventListener("input", carregarLista);
+
+        $("tabela-corpo").addEventListener("click", function (evento) {
+            const botaoEditar = evento.target.closest(".btn-editar");
+            const botaoExcluir = evento.target.closest(".btn-excluir");
+
+            if (botaoEditar) {
+                const nome = botaoEditar.dataset.nome;
+                preencherFormulario(nome, municipiosAtuais[nome]);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            if (botaoExcluir) {
+                excluir(botaoExcluir.dataset.nome);
+            }
+        });
+
+        carregarMetadados();
+        carregarLista();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
